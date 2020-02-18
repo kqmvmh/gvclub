@@ -65,6 +65,10 @@ if __name__ == '__main__':
     conn = conn_mongo()
     col = conn['machotube']
     v_info = col.find_one({"dl_res": '0'})
+    machotube.get_url.get_ids("japanese", 1)
+    machotube.get_url.get_ids("japanese", 2)
+    machotube.get_url.get_ids("japanese", 3)
+
     while v_info.count >0:
         dataid_v = v_info['data_id']
         dl_res = main_dl(v_info['dl_url'])
@@ -73,3 +77,5 @@ if __name__ == '__main__':
             v_info['dl_res'] == '1'
             col.update_one({"data_id": dataid_v}, {'$set': v_info})
         v_info = col.find_one({"dl_res": '0'})
+
+    print("已完成")
