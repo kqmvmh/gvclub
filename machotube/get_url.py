@@ -30,8 +30,11 @@ def get_ids(searchword, page):
         res_i = requests.request("GET",nexturl)
         selector_i = etree.HTML(res_i.text)
         url_i = selector_i.xpath('.//source/@src')[0]
+        tag_i = selector_i.xpath('.//div[@class="b-details__list"]/div[@class="b-details__list"]/a')
+        tag_list = []
+        for tag_j in tag_i:
+            tag_list.append(tag_j)
         print(url_i)
-        print("%s open down" %filename)
         v_info = {
             "filename": filename,
             "v_url": nexturl,
@@ -39,5 +42,6 @@ def get_ids(searchword, page):
             "data_id": str(dataid),
             "datathumbid": str(datathumbid),
             "dl_url": url_i,
-            "dl_res": "0"
+            "dl_res": "0",
+            "tag_list": tag_list
         }
