@@ -48,10 +48,28 @@ def download_file(url, num_thread = 10):
         t.join()
     print('%s 下载完成' % file_name)
     
-def main(url):
+def main_dl(url):
     start = datetime.datetime.now().replace(microsecond=0)  
     download_file(url)
     end = datetime.datetime.now().replace(microsecond=0)
     use_time = end-start
     print("用时: ", end='')
     print(use_time)
+    return 1
+
+def conn_mongo():
+    conn = pymongo.MongoClient('127.0.0.1', 27017)
+    return conn
+
+if __name__ == '__main__':
+    conn = conn_mongo()
+    col = conn['machotube']
+    v_info = col.find_one({"dl_res": '0'})
+    while v_info.count >0:
+        dataid_v = v_info['data_id']
+        dl_res = main_dl(v_info['dl_url'])
+
+        if dl_res:
+            v_info['dl_res'] == '1'
+            col.update_one({"data_id": dataid_v}, {'$set': v_info})
+        v_info = col.find_one({"dl_res": '0'})

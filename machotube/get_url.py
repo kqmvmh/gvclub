@@ -4,11 +4,18 @@ import requests
 import lxml
 
 import common.setting as dl_setting
-import untils.setting as untils_setting
+import util.setting as untils_setting
 
 machourl = dl_setting.macho_url
-mongo_ip = untils_setting.mongo
+mongo_ip = untils_setting.mongo_ip
 print(machourl)
+
+def conn_mongo():
+    conn = pymongo.MongoClient('127.0.0.1', 27017)
+    return conn
+
+conn = conn_mongo()
+col = conn['machotube']
 
 def get_ids(searchword, page):
     if searchword == None:
@@ -33,7 +40,9 @@ def get_ids(searchword, page):
         tag_i = selector_i.xpath('.//div[@class="b-details__list"]/div[@class="b-details__list"]/a')
         tag_list = []
         for tag_j in tag_i:
-            tag_list.append(tag_j)
+            tag_list.append(tag_j.xpath('./text()'))
+        update_time = selector_i.xpath('div[@class="b-details__list"]/div[@class="b-details__item"]/div[@class="b-details__info"]')[1]
+        update_time = update_time.xpath('./span[@class="b-details__text"]/text()')
         print(url_i)
         v_info = {
             "filename": filename,
@@ -43,5 +52,8 @@ def get_ids(searchword, page):
             "datathumbid": str(datathumbid),
             "dl_url": url_i,
             "dl_res": "0",
-            "tag_list": tag_list
+            "tag_list": tag_list,
+            "update_time": update_time
         }
+        col.insert_one(v_info)
+    print(str(page), "结束")
